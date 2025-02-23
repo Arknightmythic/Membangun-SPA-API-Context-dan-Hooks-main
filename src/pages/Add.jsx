@@ -5,14 +5,24 @@ import Input from "../components/Input";
 
 const Add = () => {
   const navigate = useNavigate();
-  const addNoteHandler = (note) => {
-    addNote(note);
-    navigate("/");
+
+
+  const addNoteHandler = async (note) => {
+    const { error } = await addNote(note);
+
+    if (!error) {
+      navigate("/"); 
+    } else {
+      alert("Failed to add note. Please try again.");
+    }
   };
+
   return (
     <section className="add-new-page">
+
       <Input addNote={addNoteHandler} />
     </section>
   );
 };
+
 export default Add;

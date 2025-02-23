@@ -11,37 +11,56 @@ const Arsip = () => {
   const [keyword, setKeyword] = React.useState(() => {
     return searchParams.get("keyword") || "";
   });
+  const [isLoading, setIsLoading] = React.useState(true);
   const { locale } = React.useContext(LocaleContext);
 
+  
   React.useEffect(() => {
-    async function fetchNotesDataArchived() {
+    const fetchNotesDataArchived = async () => {
       const { error, data } = await getArchivedNotes();
-      !error && setNotes(data);
-    }
+      if (!error) {
+        setNotes(data);
+      }
+      setIsLoading(false);
+    };
+
     fetchNotesDataArchived();
-    return() => {
-      setNotes([])
-    }
+
+   
+    return () => {
+      setNotes([]);
+    };
   }, []);
-  function onKeywordChangedHandler(keyword) {
+
+
+  const onKeywordChangedHandler = (keyword) => {
     setKeyword(keyword);
     setSearchParams({ keyword });
-  }
+  };
+
+
   const filteredNotes = notes.filter((note) => {
     return note.title.toLowerCase().includes(keyword.toLowerCase());
   });
+
   return (
-    <>
-      <section className="homepage">
-        <section className="search-bar">
-          <h2>{locale === "id" ? "Catatan Arsip" : "Archived Note"}</h2>
-          <Search keyword={keyword} keywordChange={onKeywordChangedHandler} />
-        </section>
-        <Suspense fallback={<div>Loading</div>}>
-          <ItemList notes={filteredNotes} />
-        </Suspense>
+    <main className="homepage">
+
+      <section className="search-bar">
+        <h2>{locale === "id" ? "Catatan Arsip" : "Archived Notes"}</h2>
+        <Search keyword={keyword} keywordChange={onKeywordChangedHandler} />
       </section>
-    </>
+
+
+      <Suspense fallback={<div>{locale === "id" ? "Memuat..." : "Loading..."}</div>}>
+        {isLoading ? (
+          <div>{locale === "id" ? "Memuat catatan..." : "Loading notes..."}</div>
+        ) : (
+          <ItemList notes={filteredNotes} />
+        )}
+      </Suspense>
+    </main>
   );
 };
+
 export default Arsip;
